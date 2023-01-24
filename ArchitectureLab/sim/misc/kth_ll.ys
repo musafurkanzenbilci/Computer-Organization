@@ -1,0 +1,82 @@
+# Musa Furkan Zenbilci e2469203
+
+        .pos 0
+init:
+        irmovq stack, %rsp
+        pushq %r10
+        pushq %r9
+        irmovq $0, %r9
+        irmovq $8, %r10
+        call Main
+        subq %r10, %rsp
+        rmmovq %r9, (%rsp)
+        addq %r10, %rsp
+        halt
+        .pos 0x200
+ele0:
+        .quad 0x0005
+        .quad ele1
+ele1:
+        .quad 0x000c
+        .quad ele2
+ele2:
+        .quad 0x0010
+        .quad ele3
+ele3:
+        .quad 0x001a
+        .quad ele4
+ele4:
+        .quad 0x0030
+        .quad ele5
+ele5:
+        .quad 0x0045
+        .quad ele6
+ele6:
+        .quad 0x005e
+        .quad 0 # Remember that 0 is null.
+
+
+
+kth_ll:
+        pushq %r11 #For constant FFFF
+        pushq %r12 #For stack
+        pushq %r13 #For rdi check
+        pushq %r14 #For constant 1
+        irmovq $8, %r12
+        subq %r12, %rsp
+        irmovq $1, %r14
+        rrmovq %rdi, %r13
+        andq %r13, %r13
+        je cond
+        subq %r14, %rsi
+        je result
+loop:
+        mrmovq 8(%rdi), %rdi
+        rrmovq %rdi, %r13
+        andq %r13, %r13
+        je result
+        subq %r14, %rsi
+        jne loop
+result:
+        mrmovq 0(%rdi), %rax
+cond:
+        addq %r12, %rsp
+        popq %r11
+        popq %r12
+        popq %r13
+        popq %r14
+        ret
+
+Main:
+        irmovq ele0, %rax
+        rrmovq %rax, %rdi
+        irmovq $4, %rsi
+        call kth_ll
+        subq %r10, %rsp
+        rmmovq %r9, (%rsp)
+        addq %r10, %rsp
+        ret
+
+        .pos 0x400
+stack:
+

@@ -1,0 +1,58 @@
+#/* $begin abscopy-ys */
+##################################################################
+# abscopy.ys - copy the absolute values of a src block of n words to dst.
+# Return the sum of copied (absolute) values.
+#
+# Musa Furkan Zenbilci - 2469203
+# 
+# I included isubq from PartB and used it instead of commented 3 line.
+# Which reduced CPE from 16.9 to 15.9
+#
+# Removed the r10 = 8  assignment in the loop and put it in r8 in the beginning
+# which reduced CPE from 15.9 to 14.97
+# Removed the r10 = 1  assignment in the loop and put it in r9 in the beginning
+# which reduced CPE from 14.97 to 14.05
+
+##################################################################
+# Do not modify this portion
+# Function prologue.
+# %rdi = src, %rsi = dst, %rdx = n
+abscopy:
+##################################################################
+# You can modify this portion
+        # Loop header
+        xorq %rax,%rax          # sum = 0;
+        andq %rdx,%rdx          # n <= 0?
+        irmovq $8, %r8
+	irmovq $1, %r9
+	jle Done                # if so, goto Done:
+
+Loop:   
+        mrmovq (%rdi), %r10     # read val from src...
+        #rrmovq %r10, %r9
+	andq %r10, %r10         # val >= 0?
+        jge Positive            # if so, skip negating
+	#rrmovq %r10, %r9        # temporary move
+        #xorq %r10, %r10         # zero r10
+        #subq %r9, %r10          # negation achieved!
+	isubq 0, %r10
+	#cmovge %r9, %r10		# negation and assignment achieved in 1 line
+Positive:
+        addq %r10, %rax         # sum += absval   
+        rmmovq %r10, (%rsi)     # ...and store it to dst
+        #irmovq $1, %r10
+        subq %r9, %rdx         # n--
+	#irmovq $8, %r10
+        addq %r8, %rsi         # dst++
+        addq %r8, %rdi         # src++
+        andq %rdx,%rdx          # n > 0?
+        jg Loop                 # if so, goto Loop:
+##################################################################
+# Do not modify the following section of code
+# Function epilogue.
+Done:
+        ret
+##################################################################
+# Keep the following label at the end of your function
+End:
+#/* $end abscopy-ys */
